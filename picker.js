@@ -127,7 +127,7 @@
         handle.addEventListener("mousedown", mousedownListener, false);
     }
 
-    function addClickListener(bar, offsetX, handle, callback) {
+    function addClickListener(bar, handle, callback) {
         bar.addEventListener("mouseup", function (event) {
             handle.x.baseVal.value = event.clientX;
             callback(event.clientX);
@@ -138,7 +138,7 @@
     addMoveListener(lightHandle, 10, 330, onLightHandleMove);
     addMoveListener(saturationHandle, 10, 330, onSaturationHandleMove);
 
-    addClickListener(hueBar, 10, hueHandle, onHueHandleMove);
-    addClickListener(lightBar, 10, lightHandle, onLightHandleMove);
-    addClickListener(saturationBar, 10, saturationHandle, onSaturationHandleMove);
+    addClickListener(hueBar, hueHandle, onHueHandleMove);
+    addClickListener(lightBar, lightHandle, onLightHandleMove);
+    addClickListener(saturationBar, saturationHandle, onSaturationHandleMove);
 }());
