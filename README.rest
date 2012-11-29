@@ -1,0 +1,24 @@
+SVG color picker
+================
+
+a SVG based color picker for the web
+
+who
+---
+
+marianoguerra
+
+why
+---
+
+I want to add it to `Blockly <http://code.google.com/p/blockly/>` when finished.
+
+how
+---
+
+open picker.svg on a SVG capable browser
+
+license
+-------
+
+Apache License 2.0 + optional beer for the creator
