@@ -6,9 +6,15 @@
         saturationGradientMiddle,
         saturationGradientEnd,
         currentColor,
+
         hueHandle,
         lightHandle,
         saturationHandle,
+
+        hueBar,
+        lightBar,
+        saturationBar,
+
         container,
         
         newHue = 50, newLightness = 50, newSaturation = 100,
@@ -59,6 +65,10 @@
     hueHandle   = newHandle("hue-handle", 10, 9);
     lightHandle = newHandle("light-handle", 170, 29);
     saturationHandle = newHandle("saturation-handle", 330, 49);
+
+    hueBar   = byId("hue-bar");
+    lightBar = byId("light-bar");
+    saturationBar = byId("saturation-bar");
 
     container.appendChild(hueHandle);
     container.appendChild(lightHandle);
@@ -117,7 +127,18 @@
         handle.addEventListener("mousedown", mousedownListener, false);
     }
 
+    function addClickListener(bar, offsetX, handle, callback) {
+        bar.addEventListener("mouseup", function (event) {
+            handle.x.baseVal.value = event.clientX;
+            callback(event.clientX);
+        });
+    }
+
     addMoveListener(hueHandle, 10, 330, onHueHandleMove);
     addMoveListener(lightHandle, 10, 330, onLightHandleMove);
     addMoveListener(saturationHandle, 10, 330, onSaturationHandleMove);
+
+    addClickListener(hueBar, 10, hueHandle, onHueHandleMove);
+    addClickListener(lightBar, 10, lightHandle, onLightHandleMove);
+    addClickListener(saturationBar, 10, saturationHandle, onSaturationHandleMove);
 }());
