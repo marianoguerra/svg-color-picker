@@ -11,7 +11,7 @@ marianoguerra
 why
 ---
 
-I want to add it to `Blockly <http://code.google.com/p/blockly/>` when finished.
+I want to add it to `Blockly <http://code.google.com/p/blockly/>`_ when finished.
 
 how
 ---
