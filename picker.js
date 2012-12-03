@@ -1,24 +1,7 @@
-/*global document*/
+/*global document window*/
 (function () {
     "use strict";
-    var
-        lightGradientMiddle,
-        saturationGradientMiddle,
-        saturationGradientEnd,
-        currentColor,
-
-        hueHandle,
-        lightHandle,
-        saturationHandle,
-
-        hueBar,
-        lightBar,
-        saturationBar,
-
-        container,
-        
-        newHue = 50, newLightness = 50, newSaturation = 100,
-        SVG_NS = "http://www.w3.org/2000/svg";
+    var SVG_NS = "http://www.w3.org/2000/svg";
 
     function newSvgElement(name, attrs, parent) {
         var key, e = document.createElementNS(SVG_NS, name);
@@ -52,49 +35,7 @@
         });
     }
 
-    function byId(id) {
-        return document.getElementById(id);
-    }
-
-    lightGradientMiddle = byId("light-gradient-middle");
-    saturationGradientMiddle = byId("saturation-gradient-middle");
-    saturationGradientEnd = byId("saturation-gradient-end");
-    currentColor        = byId("current-color");
-    container           = byId("cont");
-
-    hueHandle   = newHandle("hue-handle", 10, 9);
-    lightHandle = newHandle("light-handle", 170, 29);
-    saturationHandle = newHandle("saturation-handle", 330, 49);
-
-    hueBar   = byId("hue-bar");
-    lightBar = byId("light-bar");
-    saturationBar = byId("saturation-bar");
-
-    container.appendChild(hueHandle);
-    container.appendChild(lightHandle);
-    container.appendChild(saturationHandle);
-
-    function updateCurrentColor() {
-        var color = "hsl(" + newHue + ", " + newSaturation + "%, " + newLightness + "%)";
-        currentColor.style.fill = color;
-    }
-
-    function onHueHandleMove(newX) {
-        newHue = newX + 50;
-        lightGradientMiddle.setAttribute("stop-color", "hsl(" + newHue + ", 100%, 50%)");
-        saturationGradientMiddle.setAttribute("stop-color", "hsl(" + newHue + ", 50%, 50%)");
-        saturationGradientEnd.setAttribute("stop-color", "hsl(" + newHue + ", 100%, 50%)");
-        updateCurrentColor();
-    }
-
-    function onLightHandleMove(newX) {
-        newLightness = (newX - 10) / 320 * 100;
-        updateCurrentColor();
-    }
-
-    function onSaturationHandleMove(newX) {
-        newSaturation = (newX - 2) / 320 * 100;
-        updateCurrentColor();
+    function Handle() {
     }
 
     function addMoveListener(handle, minX, maxX, callback) {
@@ -134,11 +75,78 @@
         });
     }
 
-    addMoveListener(hueHandle, 10, 330, onHueHandleMove);
-    addMoveListener(lightHandle, 10, 330, onLightHandleMove);
-    addMoveListener(saturationHandle, 10, 330, onSaturationHandleMove);
+    function byId(id) {
+        return document.getElementById(id);
+    }
 
-    addClickListener(hueBar, hueHandle, onHueHandleMove);
-    addClickListener(lightBar, lightHandle, onLightHandleMove);
-    addClickListener(saturationBar, saturationHandle, onSaturationHandleMove);
+    function ColorPicker() {
+        var
+            lightGradientMiddle,
+            saturationGradientMiddle,
+            saturationGradientEnd,
+            currentColor,
+
+            hueHandle,
+            lightHandle,
+            saturationHandle,
+
+            hueBar,
+            lightBar,
+            saturationBar,
+
+            container,
+            
+            newHue = 50, newLightness = 50, newSaturation = 100;
+
+        lightGradientMiddle      = byId("light-gradient-middle");
+        saturationGradientMiddle = byId("saturation-gradient-middle");
+        saturationGradientEnd    = byId("saturation-gradient-end");
+        currentColor             = byId("current-color");
+        container                = byId("cont");
+
+        hueHandle   = newHandle("hue-handle", 10, 9);
+        lightHandle = newHandle("light-handle", 170, 29);
+        saturationHandle = newHandle("saturation-handle", 330, 49);
+
+        hueBar   = byId("hue-bar");
+        lightBar = byId("light-bar");
+        saturationBar = byId("saturation-bar");
+
+        container.appendChild(hueHandle);
+        container.appendChild(lightHandle);
+        container.appendChild(saturationHandle);
+
+        function updateCurrentColor() {
+            var color = "hsl(" + newHue + ", " + newSaturation + "%, " + newLightness + "%)";
+            currentColor.style.fill = color;
+        }
+
+        function onHueHandleMove(newX) {
+            newHue = newX + 50;
+            lightGradientMiddle.setAttribute("stop-color", "hsl(" + newHue + ", 100%, 50%)");
+            saturationGradientMiddle.setAttribute("stop-color", "hsl(" + newHue + ", 50%, 50%)");
+            saturationGradientEnd.setAttribute("stop-color", "hsl(" + newHue + ", 100%, 50%)");
+            updateCurrentColor();
+        }
+
+        function onLightHandleMove(newX) {
+            newLightness = (newX - 10) / 320 * 100;
+            updateCurrentColor();
+        }
+
+        function onSaturationHandleMove(newX) {
+            newSaturation = (newX - 2) / 320 * 100;
+            updateCurrentColor();
+        }
+
+        addMoveListener(hueHandle, 10, 330, onHueHandleMove);
+        addMoveListener(lightHandle, 10, 330, onLightHandleMove);
+        addMoveListener(saturationHandle, 10, 330, onSaturationHandleMove);
+
+        addClickListener(hueBar, hueHandle, onHueHandleMove);
+        addClickListener(lightBar, lightHandle, onLightHandleMove);
+        addClickListener(saturationBar, saturationHandle, onSaturationHandleMove);
+    }
+
+    window.ColorPicker = ColorPicker;
 }());

@@ -30,5 +30,8 @@
 <rect id="current-color" x="340" y="10" width="30" height="50" style="stroke: #000000; fill: hsl(60, 100%, 50%); stroke-width: 1;" onmousedown="return false"/>
 
 <script xlink:href="picker.js"></script>
+<script>
+    var cp = new ColorPicker();
+</script>
 
 </svg>
