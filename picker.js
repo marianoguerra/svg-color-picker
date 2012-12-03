@@ -10,7 +10,9 @@
     }
 }(this, function () {
     "use strict";
-    var SVG_NS = "http://www.w3.org/2000/svg";
+    var
+        toHex = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"],
+        SVG_NS = "http://www.w3.org/2000/svg";
 
     function newSvgElement(name, attrs, parent) {
         var key, e = document.createElementNS(SVG_NS, name);
@@ -66,12 +68,12 @@
         }
     };
 
-    function Handle(id, x, y, xMin, xMax, onMove) {
+    function Handle(id, x, y, xMin, xMax, onMove, width, height) {
         var
             dx,
             that = this;
 
-        this.handle = newHandle(id, x, y);
+        this.handle = newHandle(id, x, y, width, height);
         this.id = id;
         this.x = x;
         this.y = y;
@@ -124,8 +126,8 @@
 
         var that = this;
 
-        this.handle = new Handle(id + "-handle", x, y - 1, x, x + width,
-                                 onHandleMove);
+        this.handle = new Handle(id + "-handle", x, y - 1, x, x + width - 5,
+                                 onHandleMove, 5, height + 2);
 
         stroke = stroke || "#000000";
         strokeWidth = strokeWidth || 1;
@@ -157,8 +159,9 @@
         }
     };
 
-    function ColorPicker(container, x, y, newHue, newLightness, newSaturation) {
+    function ColorPicker(container, x, y, newHue, newLightness, newSaturation, width, height) {
         var
+            that = this,
             stamp = Date.now(),
             defs,
 
@@ -171,8 +174,6 @@
             saturationGradientMiddle,
             saturationGradientEnd,
 
-            currentColor,
-
             hueBar,
             lightBar,
             saturationBar;
@@ -181,28 +182,30 @@
             return id + "-" + stamp;
         }
 
+        width = width || 320;
+        height = height || 10;
         newHue = (newHue === undefined) ? 0 : newHue;
         newLightness = (newLightness === undefined) ? 50 : newLightness;
         newSaturation = (newSaturation === undefined) ? 100 : newSaturation;
 
-        currentColor = newSvgElement("rect", {
-            x: x + 320 + 10,
+        this.currentColor = newSvgElement("rect", {
+            x: x + width + height,
             y: y,
-            width: 30,
-            height: 50,
+            width: height * 3,
+            height: height * 5,
             style: "stroke: #000000; fill: hsl(60, 100%, 50%); stroke-width: 1;",
             onmousedown: "return false"
         });
 
-        container.appendChild(currentColor);
+        container.appendChild(this.currentColor);
 
         function updateCurrentColor() {
             var color = "hsl(" + newHue + ", " + newSaturation + "%, " + newLightness + "%)";
-            currentColor.style.fill = color;
+            that.currentColor.style.fill = color;
         }
 
         function onHueHandleMove(newX) {
-            newHue = newX - x + 58;
+            newHue = ((newX - x) / width * 320) + 55;
             lightGradientMiddle.setAttribute("stop-color",
                                       "hsl(" + newHue + ", 100%, 50%)");
             saturationGradientMiddle.setAttribute("stop-color",
@@ -213,20 +216,20 @@
         }
 
         function onLightHandleMove(newX) {
-            newLightness = (newX - x) / 320 * 100;
+            newLightness = (newX - x) / width * 100;
             updateCurrentColor();
         }
 
         function onSaturationHandleMove(newX) {
-            newSaturation = (newX - x - 2) / 320 * 100;
+            newSaturation = (newX - x - 2) / width * 100;
             updateCurrentColor();
         }
 
-        hueBar = new Range(ns("hue-bar"), x, y, 320, 10,
+        hueBar = new Range(ns("hue-bar"), x, y, width, height,
                                   onHueHandleMove, ns("hue-gradient"));
-        lightBar = new Range(ns("light-bar"), x, y + 20, 320, 10,
+        lightBar = new Range(ns("light-bar"), x, y + (height * 2), width, height,
                                   onLightHandleMove, ns("light-gradient"));
-        saturationBar = new Range(ns("saturation-bar"), x, y + 40, 320, 10,
+        saturationBar = new Range(ns("saturation-bar"), x, y + (height * 4), width, height,
                                   onSaturationHandleMove, ns("saturation-gradient"));
 
         defs = newSvgElement("defs", {}, container);
@@ -330,6 +333,23 @@
         saturationBar.setValue(newSaturation);
 
     }
+
+    ColorPicker.prototype = {
+        getColorRGB: function () {
+            return "#" + this.currentColor.style.fill
+                .slice(4, -1)
+                .split(", ")
+                .map(function (item) {
+                    var
+                        value = parseInt(item, 10),
+                        first = value % 16,
+                        second = Math.floor(value / 16);
+
+                    return toHex[second] + toHex[first];
+                })
+                .join("");
+        }
+    };
 
     return ColorPicker;
 }));

@@ -1,11 +1,32 @@
 <svg id="cont" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 
+<text id="c1" x="10" y="15">color1</text>
+
+<text id="c2" x="160" y="15">color2</text>
+
+<text id="c3" x="310" y="15">color3</text>
+
 <script xlink:href="picker.js"></script>
 <script>
     var container = document.getElementById("cont");
-    var cp0 = new ColorPicker(container, 40, 90, 0, 50, 100);
-    var cp1 = new ColorPicker(container, 90, 190, 50, 50, 100);
-    var cp2 = new ColorPicker(container, 190, 290, 30, 40, 80);
+    var cp1 = new ColorPicker(container, 40, 90, 0, 50, 100, 180);
+    var cp2 = new ColorPicker(container, 90, 150, 50, 50, 100, 320, 20);
+    var cp3 = new ColorPicker(container, 190, 300, 30, 40, 80, 500, 40);
+
+    function makeColorDisplay(id, picker) {
+        function displayColor() {
+            var element = document.getElementById(id);
+            element.firstChild.textContent = picker.getColorRGB();
+            setTimeout(displayColor, 1000);
+        }
+
+        displayColor();
+    }
+
+    makeColorDisplay("c1", cp1);
+    makeColorDisplay("c2", cp2);
+    makeColorDisplay("c3", cp3);
+
 </script>
 
 </svg>
