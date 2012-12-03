@@ -35,23 +35,27 @@
         });
     }
 
-    function Handle() {
+    function byId(id) {
+        return document.getElementById(id);
     }
 
-    function addMoveListener(handle, minX, maxX, callback) {
-        var dx;
+    function Handle(id, x, y, xMin, xMax, onMove) {
+        var
+            dx,
+            that = this;
+
+        this.handle = newHandle(id, x, y);
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.width = this.xMax - this.xMin;
+        this.onMove = onMove;
+
 
         function mousemoveListener(evt) {
-            var id, newHue, newX = evt.clientX + dx;
-
-            if (evt.clientX > maxX || evt.clientX < minX) {
-                return;
-            }
-
-            id = handle.ownerSVGElement.suspendRedraw(1000);
-            handle.x.baseVal.value = newX;
-            handle.ownerSVGElement.unsuspendRedraw(id);
-            callback(newX);
+            that.setX(evt.clientX);
         }
 
         function mouseupListener(evt) {
@@ -60,61 +64,103 @@
         }
 
         function mousedownListener(evt) {
-            dx = handle.x.baseVal.value - evt.clientX;
+            dx = that.handle.x.baseVal.value - evt.clientX;
             document.addEventListener("mousemove", mousemoveListener, true);
             document.addEventListener("mouseup", mouseupListener, true);
         }
 
-        handle.addEventListener("mousedown", mousedownListener, false);
+        this.handle.addEventListener("mousedown", mousedownListener, false);
     }
 
-    function addClickListener(bar, handle, callback) {
-        bar.addEventListener("mouseup", function (event) {
-            handle.x.baseVal.value = event.clientX;
-            callback(event.clientX);
+    Handle.prototype = {
+        addToParent: function (parent) {
+            parent.appendChild(this.handle);
+        },
+        setX: function (x) {
+            var id;
+
+            if (x > this.xMax || x < this.xMin) {
+                return;
+            }
+
+            id = this.handle.ownerSVGElement.suspendRedraw(1000);
+            this.handle.x.baseVal.value = x;
+            this.handle.ownerSVGElement.unsuspendRedraw(id);
+            this.onMove(x);
+        },
+        setValue: function (value) {
+            this.setX(this.x + (value / 100.0 * this.width));
+        }
+    };
+
+    function Range(id, x, y, width, height, onHandleMove, gradientId, stroke,
+                   strokeWidth) {
+
+        var that = this;
+
+        this.handle = new Handle(id + "-handle", x, y - 1, x, x + width,
+                                 onHandleMove);
+
+        stroke = stroke || "#000000";
+        strokeWidth = strokeWidth || 1;
+
+        this.range = newSvgElement("rect", {
+            id: id,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            style: "fill:url(#" + gradientId + "); stroke: " + stroke +
+                "; stroke-width: " + strokeWidth + ";",
+            onmousedown: "return false"
+        });
+
+        this.range.addEventListener("mouseup", function (event) {
+            that.handle.x.baseVal.value = event.clientX;
+            onHandleMove(event.clientX);
         });
     }
 
-    function byId(id) {
-        return document.getElementById(id);
-    }
+    Range.prototype = {
+        addToParent: function (parent) {
+            parent.appendChild(this.range);
+            this.handle.addToParent(parent);
+        },
+        setValue: function (position) {
+            this.handle.setValue(position);
+        }
+    };
 
-    function ColorPicker() {
+    function ColorPicker(container, x, y, newHue, newLightness, newSaturation) {
         var
             lightGradientMiddle,
             saturationGradientMiddle,
             saturationGradientEnd,
             currentColor,
 
-            hueHandle,
-            lightHandle,
-            saturationHandle,
-
             hueBar,
             lightBar,
-            saturationBar,
+            saturationBar;
 
-            container,
-            
-            newHue = 50, newLightness = 50, newSaturation = 100;
+        newHue = (newHue === undefined) ? 0 : newHue;
+        newLightness = (newLightness === undefined) ? 50 : newLightness;
+        newSaturation = (newSaturation === undefined) ? 100 : newSaturation;
 
         lightGradientMiddle      = byId("light-gradient-middle");
         saturationGradientMiddle = byId("saturation-gradient-middle");
         saturationGradientEnd    = byId("saturation-gradient-end");
-        currentColor             = byId("current-color");
-        container                = byId("cont");
 
-        hueHandle   = newHandle("hue-handle", 10, 9);
-        lightHandle = newHandle("light-handle", 170, 29);
-        saturationHandle = newHandle("saturation-handle", 330, 49);
+        //<rect id="current-color" x="340" y="10" width="30" height="50" style="stroke: #000000; fill: hsl(60, 100%, 50%); stroke-width: 1;" onmousedown="return false"/>
+        currentColor = newSvgElement("rect", {
+            x: x + 320 + 10,
+            y: y,
+            width: 30,
+            height: 50,
+            style: "stroke: #000000; fill: hsl(60, 100%, 50%); stroke-width: 1;",
+            onmousedown: "return false"
+        });
 
-        hueBar   = byId("hue-bar");
-        lightBar = byId("light-bar");
-        saturationBar = byId("saturation-bar");
-
-        container.appendChild(hueHandle);
-        container.appendChild(lightHandle);
-        container.appendChild(saturationHandle);
+        container.appendChild(currentColor);
 
         function updateCurrentColor() {
             var color = "hsl(" + newHue + ", " + newSaturation + "%, " + newLightness + "%)";
@@ -122,15 +168,18 @@
         }
 
         function onHueHandleMove(newX) {
-            newHue = newX + 50;
-            lightGradientMiddle.setAttribute("stop-color", "hsl(" + newHue + ", 100%, 50%)");
-            saturationGradientMiddle.setAttribute("stop-color", "hsl(" + newHue + ", 50%, 50%)");
-            saturationGradientEnd.setAttribute("stop-color", "hsl(" + newHue + ", 100%, 50%)");
+            newHue = newX - x + 58;
+            lightGradientMiddle.setAttribute("stop-color",
+                                      "hsl(" + newHue + ", 100%, 50%)");
+            saturationGradientMiddle.setAttribute("stop-color",
+                                      "hsl(" + newHue + ", 50%, 50%)");
+            saturationGradientEnd.setAttribute("stop-color",
+                                      "hsl(" + newHue + ", 100%, 50%)");
             updateCurrentColor();
         }
 
         function onLightHandleMove(newX) {
-            newLightness = (newX - 10) / 320 * 100;
+            newLightness = (newX - x) / 320 * 100;
             updateCurrentColor();
         }
 
@@ -139,13 +188,20 @@
             updateCurrentColor();
         }
 
-        addMoveListener(hueHandle, 10, 330, onHueHandleMove);
-        addMoveListener(lightHandle, 10, 330, onLightHandleMove);
-        addMoveListener(saturationHandle, 10, 330, onSaturationHandleMove);
+        hueBar = new Range("hue-bar", x, y, 320, 10,
+                                  onHueHandleMove, "hue-gradient");
+        lightBar = new Range("light-bar", x, y + 20, 320, 10,
+                                  onLightHandleMove, "light-gradient");
+        saturationBar = new Range("saturation-bar", x, y + 40, 320, 10,
+                                  onSaturationHandleMove, "saturation-gradient");
 
-        addClickListener(hueBar, hueHandle, onHueHandleMove);
-        addClickListener(lightBar, lightHandle, onLightHandleMove);
-        addClickListener(saturationBar, saturationHandle, onSaturationHandleMove);
+        hueBar.addToParent(container);
+        lightBar.addToParent(container);
+        saturationBar.addToParent(container);
+
+        hueBar.setValue(newHue);
+        lightBar.setValue(newLightness);
+        saturationBar.setValue(newSaturation);
     }
 
     window.ColorPicker = ColorPicker;

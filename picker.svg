@@ -24,14 +24,12 @@
  </linearGradient>
 </defs>
 
-<rect id="hue-bar" x="10" y="10" width="320" height="10" style="fill:url(#hue-gradient); stroke: #000; stroke-width: 1;" onmousedown="return false"/>
-<rect id="light-bar" x="10" y="30" width="320" height="10" style="fill:url(#light-gradient); stroke: #000; stroke-width: 1;" onmousedown="return false"/>
-<rect id="saturation-bar" x="10" y="50" width="320" height="10" style="fill:url(#saturation-gradient); stroke: #000; stroke-width: 1;" onmousedown="return false"/>
-<rect id="current-color" x="340" y="10" width="30" height="50" style="stroke: #000000; fill: hsl(60, 100%, 50%); stroke-width: 1;" onmousedown="return false"/>
-
 <script xlink:href="picker.js"></script>
 <script>
-    var cp = new ColorPicker();
+    var container = document.getElementById("cont");
+    var cp0 = new ColorPicker(container, 40, 90, 0, 50, 100);
+    var cp1 = new ColorPicker(container, 90, 190, 50, 50, 100);
+    var cp2 = new ColorPicker(container, 190, 290, 30, 40, 80);
 </script>
 
 </svg>
