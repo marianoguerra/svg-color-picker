@@ -1,29 +1,5 @@
 <svg id="cont" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 
-<defs>
- <linearGradient id="light-gradient">
-  <stop id="light-gradient-start"  offset="0"   stop-color="hsl(60, 100%, 0%)"   stop-opacity="1"/>
-  <stop id="light-gradient-middle" offset="0.5" stop-color="hsl(60, 100%, 50%)"  stop-opacity="1"/>
-  <stop id="light-gradient-end"    offset="1"   stop-color="hsl(60, 100%, 100%)" stop-opacity="1"/>
- </linearGradient>
-
- <linearGradient id="saturation-gradient">
-  <stop id="saturation-gradient-start"  offset="0"   stop-color="hsl(60, 0%, 50%)"   stop-opacity="1"/>
-  <stop id="saturation-gradient-middle" offset="0.5" stop-color="hsl(60, 50%, 50%)"  stop-opacity="1"/>
-  <stop id="saturation-gradient-end"    offset="1"   stop-color="hsl(60, 100%, 50%)" stop-opacity="1"/>
- </linearGradient>
-
- <linearGradient id="hue-gradient">
-  <stop offset="0"          style="stop-color:#ffef15;stop-opacity:1;" />
-  <stop offset="0.16105497" style="stop-color:#60ff18;stop-opacity:1;" />
-  <stop offset="0.35173747" style="stop-color:#02fff9;stop-opacity:1;" />
-  <stop offset="0.48789391" style="stop-color:#0202ff;stop-opacity:1;" />
-  <stop offset="0.70091939" style="stop-color:#fd00ca;stop-opacity:1;" />
-  <stop offset="0.83720928" style="stop-color:#ff1c1c;stop-opacity:1;" />
-  <stop offset="1"          style="stop-color:#ff0000;stop-opacity:1;" />
- </linearGradient>
-</defs>
-
 <script xlink:href="picker.js"></script>
 <script>
     var container = document.getElementById("cont");

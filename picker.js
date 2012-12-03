@@ -39,6 +39,24 @@
         return document.getElementById(id);
     }
 
+    function LinearGradient(id, stops) {
+        var that = this;
+
+        this.gradient = newSvgElement("linearGradient", {
+            id: id
+        });
+
+        stops.forEach(function (stopAttrs) {
+            that.gradient.appendChild(newSvgElement("stop", stopAttrs));
+        });
+    }
+
+    LinearGradient.prototype = {
+        addToParent: function (parent) {
+            parent.appendChild(this.gradient);
+        }
+    };
+
     function Handle(id, x, y, xMin, xMax, onMove) {
         var
             dx,
@@ -116,7 +134,7 @@
         });
 
         this.range.addEventListener("mouseup", function (event) {
-            that.handle.x.baseVal.value = event.clientX;
+            that.handle.handle.x.baseVal.value = event.clientX;
             onHandleMove(event.clientX);
         });
     }
@@ -133,22 +151,31 @@
 
     function ColorPicker(container, x, y, newHue, newLightness, newSaturation) {
         var
+            stamp = Date.now(),
+            defs,
+
+            hueGradient,
+
+            lightGradient,
             lightGradientMiddle,
+
+            saturationGradient,
             saturationGradientMiddle,
             saturationGradientEnd,
+
             currentColor,
 
             hueBar,
             lightBar,
             saturationBar;
 
+        function ns(id) {
+            return id + "-" + stamp;
+        }
+
         newHue = (newHue === undefined) ? 0 : newHue;
         newLightness = (newLightness === undefined) ? 50 : newLightness;
         newSaturation = (newSaturation === undefined) ? 100 : newSaturation;
-
-        lightGradientMiddle      = byId("light-gradient-middle");
-        saturationGradientMiddle = byId("saturation-gradient-middle");
-        saturationGradientEnd    = byId("saturation-gradient-end");
 
         //<rect id="current-color" x="340" y="10" width="30" height="50" style="stroke: #000000; fill: hsl(60, 100%, 50%); stroke-width: 1;" onmousedown="return false"/>
         currentColor = newSvgElement("rect", {
@@ -188,12 +215,104 @@
             updateCurrentColor();
         }
 
-        hueBar = new Range("hue-bar", x, y, 320, 10,
-                                  onHueHandleMove, "hue-gradient");
-        lightBar = new Range("light-bar", x, y + 20, 320, 10,
-                                  onLightHandleMove, "light-gradient");
-        saturationBar = new Range("saturation-bar", x, y + 40, 320, 10,
-                                  onSaturationHandleMove, "saturation-gradient");
+        hueBar = new Range(ns("hue-bar"), x, y, 320, 10,
+                                  onHueHandleMove, ns("hue-gradient"));
+        lightBar = new Range(ns("light-bar"), x, y + 20, 320, 10,
+                                  onLightHandleMove, ns("light-gradient"));
+        saturationBar = new Range(ns("saturation-bar"), x, y + 40, 320, 10,
+                                  onSaturationHandleMove, ns("saturation-gradient"));
+
+        defs = newSvgElement("defs", {}, container);
+
+        lightGradient = new LinearGradient(ns("light-gradient"), [
+            {
+                id: ns("light-gradient-start"),
+                offset: "0",
+                "stop-color": "hsl(60, 100%, 0%)",
+                "stop-opacity": "1"
+            },
+            {
+                id: ns("light-gradient-middle"),
+                offset: "0.5",
+                "stop-color": "hsl(60, 100%, 50%)",
+                "stop-opacity": "1"
+            },
+            {
+                id: ns("light-gradient-end"),
+                offset: "1",
+                "stop-color": "hsl(60, 100%, 100%)",
+                "stop-opacity": "1"
+            }
+        ]);
+
+
+        saturationGradient = new LinearGradient(ns("saturation-gradient"), [
+            {
+                id: ns("saturation-gradient-start"),
+                offset: "0",
+                "stop-color": "hsl(60, 0%, 50%)",
+                "stop-opacity": "1"
+            },
+            {
+                id: ns("saturation-gradient-middle"),
+                offset: "0.5",
+                "stop-color": "hsl(60, 50%, 50%)",
+                "stop-opacity": "1"
+            },
+            {
+                id: ns("saturation-gradient-end"),
+                offset: "1",
+                "stop-color": "hsl(60, 100%, 50%)",
+                "stop-opacity": "1"
+            }
+        ]);
+
+
+        hueGradient = new LinearGradient(ns("hue-gradient"), [
+            {
+                "offset": "0",
+                "stop-color": "#ffef15",
+                "stop-opacity": "1"
+            },
+            {
+                "offset": "0.16105497",
+                "stop-color": "#60ff18",
+                "stop-opacity": "1"
+            },
+            {
+                "offset": "0.35173747",
+                "stop-color": "#02fff9",
+                "stop-opacity": "1"
+            },
+            {
+                "offset": "0.48789391",
+                "stop-color": "#0202ff",
+                "stop-opacity": "1"
+            },
+            {
+                "offset": "0.70091939",
+                "stop-color": "#fd00ca",
+                "stop-opacity": "1"
+            },
+            {
+                "offset": "0.83720928",
+                "stop-color": "#ff1c1c",
+                "stop-opacity": "1"
+            },
+            {
+                "offset": "1",
+                "stop-color": "#ff0000",
+                "stop-opacity": "1"
+            }
+        ]);
+
+        hueGradient.addToParent(defs);
+        lightGradient.addToParent(defs);
+        saturationGradient.addToParent(defs);
+
+        lightGradientMiddle      = byId(ns("light-gradient-middle"));
+        saturationGradientMiddle = byId(ns("saturation-gradient-middle"));
+        saturationGradientEnd    = byId(ns("saturation-gradient-end"));
 
         hueBar.addToParent(container);
         lightBar.addToParent(container);
@@ -202,6 +321,7 @@
         hueBar.setValue(newHue);
         lightBar.setValue(newLightness);
         saturationBar.setValue(newSaturation);
+
     }
 
     window.ColorPicker = ColorPicker;
