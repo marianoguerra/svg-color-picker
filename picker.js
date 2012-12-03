@@ -17,7 +17,6 @@
         return e;
     }
 
-    //<rect id="handle" x="10" y="9" width="5" height="12" style="stroke: #000000; fill: #ffffff; stroke-width: 1; cursor: pointer;" />
     function newHandle(id, x, y, width, height, stroke, fill, strokeWidth) {
         width = width || 5;
         height = height || 12;
@@ -31,7 +30,8 @@
             y: y,
             width: width,
             height: height,
-            style: "stroke: " + stroke + "; fill: " + fill + "; stroke-width: " + strokeWidth + "; cursor: pointer;"
+            style: "stroke: " + stroke + "; fill: " + fill +
+                "; stroke-width: " + strokeWidth + "; cursor: pointer;"
         });
     }
 
@@ -70,7 +70,6 @@
         this.xMax = xMax;
         this.width = this.xMax - this.xMin;
         this.onMove = onMove;
-
 
         function mousemoveListener(evt) {
             that.setX(evt.clientX);
@@ -177,7 +176,6 @@
         newLightness = (newLightness === undefined) ? 50 : newLightness;
         newSaturation = (newSaturation === undefined) ? 100 : newSaturation;
 
-        //<rect id="current-color" x="340" y="10" width="30" height="50" style="stroke: #000000; fill: hsl(60, 100%, 50%); stroke-width: 1;" onmousedown="return false"/>
         currentColor = newSvgElement("rect", {
             x: x + 320 + 10,
             y: y,
