@@ -312,25 +312,46 @@
     }
 
     ColorPicker.prototype = {
+        _getFillColor: function () {
+            return this.currentColor.style.fill;
+        },
         getColorRGBArray: function () {
-            return this.currentColor.style.fill
-                .slice(4, -1)
-                .split(", ")
-                .map(function (item) {
-                    return parseInt(item, 10);
-                });
+            var red, green, blue, fillColor = this._getFillColor();
+
+            if (fillColor.charAt(0) === "#") {
+                red = fillColor.slice(1, 3);
+                green = fillColor.slice(3, 5);
+                blue = fillColor.slice(5, 7);
+
+                return [parseInt(red, 16),
+                    parseInt(green, 16),
+                    parseInt(blue, 16)];
+            } else {
+                return this._getFillColor()
+                    .slice(4, -1)
+                    .split(", ")
+                    .map(function (item) {
+                        return parseInt(item, 10);
+                    });
+            }
         },
         getColorRGB: function () {
-            return "#" + this.getColorRGBArray()
-                .map(function (item) {
-                    var
-                        value = parseInt(item, 10),
-                        first = value % 16,
-                        second = Math.floor(value / 16);
+            var fillColor = this._getFillColor();
 
-                    return toHex[second] + toHex[first];
-                })
-                .join("");
+            if (fillColor.charAt(0) === "#") {
+                return fillColor;
+            } else {
+                return "#" + this.getColorRGBArray()
+                    .map(function (item) {
+                        var
+                            value = parseInt(item, 10),
+                            first = value % 16,
+                            second = Math.floor(value / 16);
+
+                        return toHex[second] + toHex[first];
+                    })
+                    .join("");
+            }
         },
 
         getColorHSLArray: function () {
