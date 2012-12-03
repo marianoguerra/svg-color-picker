@@ -56,8 +56,8 @@
         });
     }
 
-    function byId(id) {
-        return document.getElementById(id);
+    function byId(id, parent) {
+        return (parent || document).getElementById(id);
     }
 
     function LinearGradient(id, stops) {
@@ -78,7 +78,7 @@
         }
     };
 
-    function Handle(id, x, y, xMin, xMax, onMove, width, height) {
+    function Handle(id, x, y, xMin, xMax, onMove, width, height, parentX) {
         var
             dx,
             that = this;
@@ -91,9 +91,10 @@
         this.xMax = xMax;
         this.range = this.xMax - this.xMin;
         this.onMove = onMove;
+        this.parentX = parentX;
 
         function mousemoveListener(evt) {
-            that.setX(evt.clientX);
+            that.setX(evt.clientX - parentX);
         }
 
         function mouseupListener(evt) {
@@ -134,13 +135,13 @@
         }
     };
 
-    function Range(id, x, y, width, height, onHandleMove, gradientId, stroke,
-                   strokeWidth) {
+    function Range(id, x, y, width, height, onHandleMove, gradientId,
+                   parentX, stroke, strokeWidth) {
 
         var that = this;
 
         this.handle = new Handle(id + "-handle", x, y - 1, x, x + width - 5,
-                                 onHandleMove, 5, height + 2);
+                                 onHandleMove, 5, height + 2, parentX);
 
         stroke = stroke || "#000000";
         strokeWidth = strokeWidth || 1;
@@ -157,8 +158,8 @@
         });
 
         this.range.addEventListener("mouseup", function (event) {
-            that.handle.handle.x.baseVal.value = event.clientX;
-            onHandleMove(event.clientX);
+            that.handle.handle.x.baseVal.value = event.clientX - parentX;
+            onHandleMove(event.clientX - parentX);
         });
     }
 
@@ -181,6 +182,7 @@
             that = this,
             stamp = Date.now(),
             defs,
+            parentX = parseInt(container.getAttribute("x") || "0", 10),
 
             hueGradient,
 
@@ -241,14 +243,17 @@
         }
 
         this.hueBar = new Range(ns("hue-bar"), x, y, width, height,
-                                  onHueHandleMove, ns("hue-gradient"));
+                                  onHueHandleMove, ns("hue-gradient"),
+                                  parentX);
         this.lightBar = new Range(ns("light-bar"), x, y + (height * 2),
                                   width, height,
-                                  onLightHandleMove, ns("light-gradient"));
+                                  onLightHandleMove, ns("light-gradient"),
+                                  parentX);
         this.saturationBar = new Range(ns("saturation-bar"),
                                   x, y + (height * 4), width, height,
                                   onSaturationHandleMove,
-                                  ns("saturation-gradient"));
+                                  ns("saturation-gradient"),
+                                  parentX);
 
         defs = newSvgElement("defs", {}, container);
 
@@ -300,9 +305,9 @@
         lightGradient.addToParent(defs);
         saturationGradient.addToParent(defs);
 
-        lightGradientMiddle      = byId(ns("light-gradient-middle"));
-        saturationGradientMiddle = byId(ns("saturation-gradient-middle"));
-        saturationGradientEnd    = byId(ns("saturation-gradient-end"));
+        lightGradientMiddle      = byId(ns("light-gradient-middle"), container);
+        saturationGradientMiddle = byId(ns("saturation-gradient-middle"), container);
+        saturationGradientEnd    = byId(ns("saturation-gradient-end"), container);
 
         this.hueBar.addToParent(container);
         this.lightBar.addToParent(container);
