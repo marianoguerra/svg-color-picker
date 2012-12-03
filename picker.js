@@ -209,7 +209,7 @@
         }
 
         function onSaturationHandleMove(newX) {
-            newSaturation = (newX - 2) / 320 * 100;
+            newSaturation = (newX - x - 2) / 320 * 100;
             updateCurrentColor();
         }
 
