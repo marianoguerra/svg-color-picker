@@ -11,7 +11,8 @@
 }(this, function () {
     "use strict";
     var
-        toHex = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"],
+        toHex = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B",
+            "C", "D", "E", "F"],
         SVG_NS = "http://www.w3.org/2000/svg",
         hueGradientStops = [
             {"offset": "0", "stop-color": "#ffef15", "stop-opacity": "1"},
@@ -174,7 +175,8 @@
         }
     };
 
-    function ColorPicker(container, x, y, newHue, newSaturation, newLightness, width, height) {
+    function ColorPicker(container, x, y, newHue, newSaturation, newLightness,
+                         width, height) {
         var
             that = this,
             stamp = Date.now(),
@@ -211,7 +213,9 @@
         container.appendChild(this.currentColor);
 
         function updateCurrentColor() {
-            var color = "hsl(" + newHue + ", " + newSaturation + "%, " + newLightness + "%)";
+            var color = "hsl(" + newHue + ", " + newSaturation + "%, " +
+                newLightness + "%)";
+
             that.currentColor.style.fill = color;
         }
 
@@ -238,10 +242,13 @@
 
         this.hueBar = new Range(ns("hue-bar"), x, y, width, height,
                                   onHueHandleMove, ns("hue-gradient"));
-        this.lightBar = new Range(ns("light-bar"), x, y + (height * 2), width, height,
+        this.lightBar = new Range(ns("light-bar"), x, y + (height * 2),
+                                  width, height,
                                   onLightHandleMove, ns("light-gradient"));
-        this.saturationBar = new Range(ns("saturation-bar"), x, y + (height * 4), width, height,
-                                  onSaturationHandleMove, ns("saturation-gradient"));
+        this.saturationBar = new Range(ns("saturation-bar"),
+                                  x, y + (height * 4), width, height,
+                                  onSaturationHandleMove,
+                                  ns("saturation-gradient"));
 
         defs = newSvgElement("defs", {}, container);
 
@@ -266,7 +273,6 @@
             }
         ]);
 
-
         saturationGradient = new LinearGradient(ns("saturation-gradient"), [
             {
                 id: ns("saturation-gradient-start"),
@@ -288,7 +294,6 @@
             }
         ]);
 
-
         hueGradient = new LinearGradient(ns("hue-gradient"), hueGradientStops);
 
         hueGradient.addToParent(defs);
@@ -302,7 +307,6 @@
         this.hueBar.addToParent(container);
         this.lightBar.addToParent(container);
         this.saturationBar.addToParent(container);
-
 
         this.setHSL(newHue, newSaturation, newLightness);
     }
