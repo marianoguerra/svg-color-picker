@@ -1,5 +1,14 @@
-/*global document window*/
-(function () {
+/*global define document window*/
+(function (root, factory) {
+    "use strict";
+    if (typeof define === 'function' && define.amd) {
+        define([], function () {
+            return (root.ColorPicker = factory());
+        });
+    } else {
+        root.ColorPicker = factory();
+    }
+}(this, function () {
     "use strict";
     var SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -322,5 +331,5 @@
 
     }
 
-    window.ColorPicker = ColorPicker;
-}());
+    return ColorPicker;
+}));
