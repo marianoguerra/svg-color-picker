@@ -79,7 +79,7 @@
         this.y = y;
         this.xMin = xMin;
         this.xMax = xMax;
-        this.width = this.xMax - this.xMin;
+        this.range = this.xMax - this.xMin;
         this.onMove = onMove;
 
         function mousemoveListener(evt) {
@@ -117,7 +117,10 @@
             this.onMove(x);
         },
         setValue: function (value) {
-            this.setX(this.x + (value / 100.0 * this.width));
+            this.setX(this.x + (value / 100.0 * this.range));
+        },
+        getValue: function () {
+            return (this.handle.x.baseVal.value - this.x) / this.range;
         }
     };
 
@@ -156,10 +159,13 @@
         },
         setValue: function (position) {
             this.handle.setValue(position);
+        },
+        getValue: function () {
+            return this.handle.getValue();
         }
     };
 
-    function ColorPicker(container, x, y, newHue, newLightness, newSaturation, width, height) {
+    function ColorPicker(container, x, y, newHue, newSaturation, newLightness, width, height) {
         var
             that = this,
             stamp = Date.now(),
@@ -172,11 +178,7 @@
 
             saturationGradient,
             saturationGradientMiddle,
-            saturationGradientEnd,
-
-            hueBar,
-            lightBar,
-            saturationBar;
+            saturationGradientEnd;
 
         function ns(id) {
             return id + "-" + stamp;
@@ -225,11 +227,11 @@
             updateCurrentColor();
         }
 
-        hueBar = new Range(ns("hue-bar"), x, y, width, height,
+        this.hueBar = new Range(ns("hue-bar"), x, y, width, height,
                                   onHueHandleMove, ns("hue-gradient"));
-        lightBar = new Range(ns("light-bar"), x, y + (height * 2), width, height,
+        this.lightBar = new Range(ns("light-bar"), x, y + (height * 2), width, height,
                                   onLightHandleMove, ns("light-gradient"));
-        saturationBar = new Range(ns("saturation-bar"), x, y + (height * 4), width, height,
+        this.saturationBar = new Range(ns("saturation-bar"), x, y + (height * 4), width, height,
                                   onSaturationHandleMove, ns("saturation-gradient"));
 
         defs = newSvgElement("defs", {}, container);
@@ -324,21 +326,25 @@
         saturationGradientMiddle = byId(ns("saturation-gradient-middle"));
         saturationGradientEnd    = byId(ns("saturation-gradient-end"));
 
-        hueBar.addToParent(container);
-        lightBar.addToParent(container);
-        saturationBar.addToParent(container);
+        this.hueBar.addToParent(container);
+        this.lightBar.addToParent(container);
+        this.saturationBar.addToParent(container);
 
-        hueBar.setValue(newHue);
-        lightBar.setValue(newLightness);
-        saturationBar.setValue(newSaturation);
 
+        this.setHSL(newHue, newSaturation, newLightness);
     }
 
     ColorPicker.prototype = {
-        getColorRGB: function () {
-            return "#" + this.currentColor.style.fill
+        getColorRGBArray: function () {
+            return this.currentColor.style.fill
                 .slice(4, -1)
                 .split(", ")
+                .map(function (item) {
+                    return parseInt(item, 10);
+                });
+        },
+        getColorRGB: function () {
+            return "#" + this.getColorRGBArray()
                 .map(function (item) {
                     var
                         value = parseInt(item, 10),
@@ -348,6 +354,25 @@
                     return toHex[second] + toHex[first];
                 })
                 .join("");
+        },
+
+        getColorHSLArray: function () {
+            return [this.hueBar.getValue(), this.saturationBar.getValue(),
+                this.lightBar.getValue()];
+        },
+        getColorHSL: function () {
+            var hue, saturation, light, array;
+            array = this.getColorHSLArray();
+            hue = ("" + (array[0] * 100)).slice(0, 8);
+            saturation = ("" + (array[1] * 100)).slice(0, 8) + "%";
+            light = ("" + (array[2] * 100)).slice(0, 8) + "%";
+
+            return "hsl(" + [hue, saturation, light].join(", ") + ")";
+        },
+        setHSL: function (hue, saturation, lightness) {
+            this.hueBar.setValue(hue);
+            this.lightBar.setValue(lightness);
+            this.saturationBar.setValue(saturation);
         }
     };
 
