@@ -12,7 +12,16 @@
     "use strict";
     var
         toHex = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"],
-        SVG_NS = "http://www.w3.org/2000/svg";
+        SVG_NS = "http://www.w3.org/2000/svg",
+        hueGradientStops = [
+            {"offset": "0", "stop-color": "#ffef15", "stop-opacity": "1"},
+            {"offset": "0.16105497", "stop-color": "#60ff18", "stop-opacity": "1"},
+            {"offset": "0.35173747", "stop-color": "#02fff9", "stop-opacity": "1"},
+            {"offset": "0.48789391", "stop-color": "#0202ff", "stop-opacity": "1"},
+            {"offset": "0.70091939", "stop-color": "#fd00ca", "stop-opacity": "1"},
+            {"offset": "0.83720928", "stop-color": "#ff1c1c", "stop-opacity": "1"},
+            {"offset": "1", "stop-color": "#ff0000", "stop-opacity": "1"}
+        ];
 
     function newSvgElement(name, attrs, parent) {
         var key, e = document.createElementNS(SVG_NS, name);
@@ -280,43 +289,7 @@
         ]);
 
 
-        hueGradient = new LinearGradient(ns("hue-gradient"), [
-            {
-                "offset": "0",
-                "stop-color": "#ffef15",
-                "stop-opacity": "1"
-            },
-            {
-                "offset": "0.16105497",
-                "stop-color": "#60ff18",
-                "stop-opacity": "1"
-            },
-            {
-                "offset": "0.35173747",
-                "stop-color": "#02fff9",
-                "stop-opacity": "1"
-            },
-            {
-                "offset": "0.48789391",
-                "stop-color": "#0202ff",
-                "stop-opacity": "1"
-            },
-            {
-                "offset": "0.70091939",
-                "stop-color": "#fd00ca",
-                "stop-opacity": "1"
-            },
-            {
-                "offset": "0.83720928",
-                "stop-color": "#ff1c1c",
-                "stop-opacity": "1"
-            },
-            {
-                "offset": "1",
-                "stop-color": "#ff0000",
-                "stop-opacity": "1"
-            }
-        ]);
+        hueGradient = new LinearGradient(ns("hue-gradient"), hueGradientStops);
 
         hueGradient.addToParent(defs);
         lightGradient.addToParent(defs);
